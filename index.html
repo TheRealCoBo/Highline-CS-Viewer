@@ -934,28 +934,27 @@ function buildRepPage(doc, r, pageW, pageH) {
 
     let cx = margin + COLS[0].w;
 
-    // ── NEW HIRE BONUS row: special wide merge across B-F ──
-    // Customer = "ZZ New Hire Bonus" — merge Customer/Sale/Activation/Category/Status
-    // into one centered cell showing "New Hire Bonus", with Description+Details+Pay
-    // remaining in their own columns
+    // ── NEW HIRE BONUS row: merge B:E + F:H to match original format ──
+    // B:E (Customer/Sale/Activation/Category) → "New Hire Bonus"
+    // F:H (Status/Description/Details) → original Description text (e.g. "Week 2 Bills Pulled 13 x $50")
+    // I (Rep Pay) → unchanged
     const isNewHire = (it.customer || '').toUpperCase().startsWith('ZZ NEW HIRE');
     if (isNewHire) {
-      const mergedW = COLS[1].w + COLS[2].w + COLS[3].w + COLS[4].w + COLS[5].w;
-      drawCell(doc, cx, y, mergedW, ROW_H, 'New Hire Bonus',
+      // Merged left block: Customer + Sale + Activation + Category
+      const leftW = COLS[1].w + COLS[2].w + COLS[3].w + COLS[4].w;
+      drawCell(doc, cx, y, leftW, ROW_H, 'New Hire Bonus',
         { fill: PDF_CREAM, bold: true, size: 9, align: 'center', border: true });
-      cx += mergedW;
+      cx += leftW;
 
-      // Description
-      drawCell(doc, cx, y, COLS[6].w, ROW_H, it.description||'',
-        { fill: PDF_CREAM, size: 8, align:'left', border: true });
-      cx += COLS[6].w;
-      // Details
-      drawCell(doc, cx, y, COLS[7].w, ROW_H, it.detail||'',
-        { fill: PDF_CREAM, size: 8, align:'left', border: true });
-      cx += COLS[7].w;
-      // Rep Pay
+      // Merged right block: Status + Description + Details (shows description content)
+      const rightW = COLS[5].w + COLS[6].w + COLS[7].w;
+      drawCell(doc, cx, y, rightW, ROW_H, it.description || '',
+        { fill: PDF_CREAM, size: 9, align: 'center', border: true });
+      cx += rightW;
+
+      // Rep Pay (own column)
       drawCell(doc, cx, y, COLS[8].w, ROW_H, fmtMoney(it.repPay),
-        { fill: PDF_CREAM, bold: true, size: 8, align:'right', color: PDF_GREEN, border: true });
+        { fill: PDF_CREAM, bold: true, size: 8, align: 'right', color: PDF_GREEN, border: true });
 
       y += ROW_H;
       return; // skip the rest of the row drawing
