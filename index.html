@@ -260,7 +260,9 @@ function saveNote(repName, v)  { localStorage.setItem(noteKey(repName), v); }
 
 function displayCustomer(name) {
   // Strip "ZZ " prefix used as sort hack (forces New Hire Bonus to bottom)
-  return String(name || '').replace(/^ZZs+/, '');
+  var s = String(name || '');
+  if (s.substring(0, 3) === 'ZZ ') return s.substring(3);
+  return s;
 }
 
 function fmtMoney(n) {
