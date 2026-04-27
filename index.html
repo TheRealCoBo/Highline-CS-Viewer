@@ -946,9 +946,10 @@ function buildRepPage(doc, r, pageW, pageH) {
         { fill: PDF_CREAM, bold: true, size: 9, align: 'center', border: true });
       cx += leftW;
 
-      // Merged right block: Status + Description + Details (shows description content)
+      // Merged right block: Status + Description + Details (shows the detail content
+      // like "Week 2 Bills Pulled 13 x $50" which lives in the detail field)
       const rightW = COLS[5].w + COLS[6].w + COLS[7].w;
-      drawCell(doc, cx, y, rightW, ROW_H, it.description || '',
+      drawCell(doc, cx, y, rightW, ROW_H, it.detail || '',
         { fill: PDF_CREAM, size: 9, align: 'center', border: true });
       cx += rightW;
 
