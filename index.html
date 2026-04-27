@@ -688,13 +688,13 @@ function exportOfficePDFViewer() {
 
   let pageNum = 1;
   function addPageHeader() {
-    pdfBanner(doc, pageW, `${OFFICE}   ·   Pay Period: ${PERIOD.from} – ${PERIOD.to}`);
+    pdfBanner(doc, pageW, OFFICE + '   ·   Pay Period: ' + PERIOD.from + ' – ' + PERIOD.to);
     const hx = margin;
     let hy = 50;
     drawHeaderRow(doc, hx, hy, COLS, HEAD_H);
     // Footer
     doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(...PDF_DIM);
-    doc.text(`${OFFICE} · ${PERIOD.from}–${PERIOD.to} · Page ${pageNum}`,
+    doc.text(OFFICE + ' · ' + PERIOD.from + '–' + PERIOD.to + ' · Page ' + pageNum,
              pageW/2, pageH - 8, {align:'center'});
     return hy + HEAD_H;
   }
@@ -782,7 +782,7 @@ function exportOfficePDFViewer() {
   doc.text(fmtMoney(grandRev), revX + COLS[8].w - 4, y + 15, { align:'right' });
   doc.text(fmtMoney(grandPay), margin + usableW - 4, y + 15, { align:'right' });
 
-  doc.save(`CS_${OFFICE.replace(/[^a-z0-9]/gi,'_')}_${PERIOD.from.replace(/\//g,'-')}.pdf`);
+  doc.save('CS_' + OFFICE.replace(/[^a-z0-9]/gi,'_') + '_' + PERIOD.from.replace(///g,'-') + '.pdf');
 }
 
 // ── ALL REPS PDF — landscape, one page per rep ─────────────
@@ -798,7 +798,7 @@ function exportAllRepsPDFViewer() {
     buildRepPage(doc, r, pageW, pageH);
   });
 
-  doc.save(`AllReps_${OFFICE.replace(/[^a-z0-9]/gi,'_')}_${PERIOD.from.replace(/\//g,'-')}.pdf`);
+  doc.save('AllReps_' + OFFICE.replace(/[^a-z0-9]/gi,'_') + '_' + PERIOD.from.replace(///g,'-') + '.pdf');
 }
 
 // ── SINGLE REP PDF ────────────────────────────────────────
@@ -810,7 +810,7 @@ function exportSingleRepPDFViewer(repName) {
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
   buildRepPage(doc, r, pageW, pageH);
-  doc.save(`${repName.replace(/[^a-z0-9]/gi,'_')}_${PERIOD.from.replace(/\//g,'-')}.pdf`);
+  doc.save(repName.replace(/[^a-z0-9]/gi,'_') + '_' + PERIOD.from.replace(///g,'-') + '.pdf');
 }
 
 // ── BUILD ONE REP PAGE (landscape) ────────────────────────
@@ -860,7 +860,7 @@ function buildRepPage(doc, r, pageW, pageH) {
   custSpans.forEach(s => { for(let i=s.start;i<s.start+s.count;i++) custSpanMap[i]=s; });
 
   // ── Draw banner ──
-  let y = pdfBanner(doc, pageW, `Pay Period: ${PERIOD.from} – ${PERIOD.to}`);
+  let y = pdfBanner(doc, pageW, 'Pay Period: ' + PERIOD.from + ' – ' + PERIOD.to);
 
   // ── Header row ──
   drawHeaderRow(doc, margin, y, COLS, HEAD_H);
@@ -881,7 +881,7 @@ function buildRepPage(doc, r, pageW, pageH) {
   // Footer
   function drawFooter() {
     doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(...PDF_DIM);
-    doc.text(`${r.rep} · ${OFFICE} · ${PERIOD.from}–${PERIOD.to} · Page ${pageNum}`,
+    doc.text(r.rep + ' · ' + OFFICE + ' · ' + PERIOD.from + '–' + PERIOD.to + ' · Page ' + pageNum,
              pageW/2, pageH - 8, {align:'center'});
   }
   drawFooter();
@@ -894,7 +894,7 @@ function buildRepPage(doc, r, pageW, pageH) {
     // Check page overflow — skip rep col on new pages (already drawn)
     if (y + ROW_H > pageH - 30 && idx > 0) {
       doc.addPage(); pageNum++;
-      y = pdfBanner(doc, pageW, `Pay Period: ${PERIOD.from} – ${PERIOD.to} (cont.)`);
+      y = pdfBanner(doc, pageW, 'Pay Period: ' + PERIOD.from + ' – ' + PERIOD.to + ' (cont.)');
       drawHeaderRow(doc, margin, y, COLS, HEAD_H);
       y += HEAD_H;
       drawFooter();
@@ -975,7 +975,6 @@ function buildRepPage(doc, r, pageW, pageH) {
   doc.rect(margin, 48, usableW, y + barH - 48, 'S');
 }
 
-// ── BOOT ──────────────────────────────────────────────────
 
 // Draw the two-row header banner used on every sheet
 function pdfBanner(doc, pageW, line2) {
@@ -1010,7 +1009,7 @@ function exportOfficePDFViewer() {
   const pageH = doc.internal.pageSize.getHeight();
 
   const startY = pdfBanner(doc, pageW,
-    `${OFFICE}   ·   Pay Period: ${PERIOD.from} – ${PERIOD.to}`);
+    OFFICE + '   ·   Pay Period: ' + PERIOD.from + ' – ' + PERIOD.to);
 
   // Build flat row array sorted by rep (A-Z) then customer (A-Z)
   const repsSorted = REPS.slice().sort((a, b) => a.rep.localeCompare(b.rep));
@@ -1125,13 +1124,13 @@ function exportOfficePDFViewer() {
       doc.setFontSize(7);
       doc.setTextColor(...PDF_DIM);
       doc.text(
-        `${OFFICE} · ${PERIOD.from}–${PERIOD.to} · Page ${data.pageNumber}`,
+        OFFICE + ' · ' + PERIOD.from + '–' + PERIOD.to + ' · Page ' + data.pageNumber,
         pageW / 2, pageH - 8, { align: 'center' }
       );
     }
   });
 
-  doc.save(`CS_${OFFICE.replace(/[^a-z0-9]/gi,'_')}_${PERIOD.from.replace(/\//g,'-')}.pdf`);
+  doc.save('CS_' + OFFICE.replace(/[^a-z0-9]/gi,'_') + '_' + PERIOD.from.replace(///g,'-') + '.pdf');
 }
 
 // ── ALL REPS PDF — one rep per page, portrait, no revenue ─
@@ -1145,7 +1144,7 @@ function exportAllRepsPDFViewer() {
     if (idx > 0) doc.addPage();
     buildRepPage(doc, r, pageW, pageH);
   });
-  doc.save(`AllReps_${OFFICE.replace(/[^a-z0-9]/gi,'_')}_${PERIOD.from.replace(///g,'-')}.pdf`);
+  doc.save('AllReps_' + OFFICE.replace(/[^a-z0-9]/gi,'_') + '_' + PERIOD.from.replace(///g,'-') + '.pdf');
 }
 
 function exportSingleRepPDFViewer(repName) {
@@ -1156,11 +1155,11 @@ function exportSingleRepPDFViewer(repName) {
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
   buildRepPage(doc, r, pageW, pageH);
-  doc.save(`${repName.replace(/[^a-z0-9]/gi,'_')}_${PERIOD.from.replace(///g,'-')}.pdf`);
+  doc.save(repName.replace(/[^a-z0-9]/gi,'_') + '_' + PERIOD.from.replace(///g,'-') + '.pdf');
 }
 
 function buildRepPage(doc, r, pageW, pageH) {
-  const startY = pdfBanner(doc, pageW, `Pay Period: ${PERIOD.from} – ${PERIOD.to}`);
+  const startY = pdfBanner(doc, pageW, 'Pay Period: ' + PERIOD.from + ' – ' + PERIOD.to);
 
   const sorted = r.items.slice().sort((a, b) => {
     const cc = (a.customer||'').localeCompare(b.customer||'');
@@ -1280,7 +1279,7 @@ function buildRepPage(doc, r, pageW, pageH) {
       doc.setFontSize(7);
       doc.setTextColor(...PDF_DIM);
       doc.text(
-        `${r.rep} · ${OFFICE} · ${PERIOD.from}–${PERIOD.to} · Page ${data.pageNumber}`,
+        r.rep + ' · ' + OFFICE + ' · ' + PERIOD.from + '–' + PERIOD.to + ' · Page ' + data.pageNumber,
         pageW / 2, pageH - 8, { align: 'center' }
       );
     }
