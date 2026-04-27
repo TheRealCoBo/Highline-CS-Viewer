@@ -723,14 +723,22 @@ function exportOfficePDFViewer() {
 
     const repFill = repFills[it.repName] === 0 ? PDF_PINK : PDF_PINK2;
     const isBonusCat = it.category === 'Bonus';
+    const isEleCat   = it.category === 'ELE';
 
     let cx = margin;
     COLS.forEach((col, ci) => {
+      // Skip Status column (5) — it's drawn as part of the merged Category cell
+      if (ci === 5 && (isBonusCat || isEleCat)) {
+        cx += col.w;
+        return;
+      }
+
       let cellText = '';
       let fill     = PDF_WHITE;
       let bold     = false;
       let align    = col.align || 'left';
       let color    = PDF_DARK;
+      let cellW    = col.w;
 
       if (ci === 0) { // Rep — show only on first row
         fill = repFill;
@@ -746,12 +754,22 @@ function exportOfficePDFViewer() {
       } else if (ci === 3) { // Activation Date
         fill = repFill;
         cellText = isFirstCust ? (it.actDate||'') : '';
-      } else if (ci === 4) { // Category
-        fill = isBonusCat ? PDF_CREAM : PDF_WHITE;
-        cellText = it.category;
-      } else if (ci === 5) { // Status
-        fill = isBonusCat ? PDF_CREAM : PDF_WHITE;
-        cellText = isBonusCat ? '' : it.status; // hidden when Bonus (merged visually)
+      } else if (ci === 4) { // Category — merge with Status for ELE/Bonus rows
+        if (isBonusCat) {
+          fill = PDF_CREAM;
+          cellText = 'Bonus';
+          align = 'center';
+          cellW = COLS[4].w + COLS[5].w; // span across Status
+        } else if (isEleCat) {
+          fill = PDF_WHITE;
+          cellText = 'Accepted By Supplier';
+          align = 'center';
+          cellW = COLS[4].w + COLS[5].w; // span across Status
+        } else {
+          cellText = it.category;
+        }
+      } else if (ci === 5) { // Status (only shown when not merged)
+        cellText = it.status;
       } else if (ci === 6) { // Description
         cellText = it.desc;
       } else if (ci === 7) { // Details
@@ -766,9 +784,9 @@ function exportOfficePDFViewer() {
         bold  = true;
       }
 
-      drawCell(doc, cx, y, col.w, ROW_H, cellText,
+      drawCell(doc, cx, y, cellW, ROW_H, cellText,
         { fill, bold, size: 7.5, align, color, border: true });
-      cx += col.w;
+      cx += cellW;
     });
 
     // Draw outer left border bold on rep column
@@ -932,10 +950,17 @@ function buildRepPage(doc, r, pageW, pageH) {
     cx += COLS[1].w + COLS[2].w + COLS[3].w;
 
     // ── Category + Status ──
+    // For both ELE and Bonus rows, merge Category+Status horizontally
+    // ELE → "Accepted By Supplier"  ·  Bonus → "Bonus"
     if (isBonusCat) {
       const mergedW = COLS[4].w + COLS[5].w;
       drawCell(doc, cx, y, mergedW, ROW_H, 'Bonus',
         { fill: PDF_CREAM, size: 8, align:'center', border: true });
+      cx += mergedW;
+    } else if (it.category === 'ELE') {
+      const mergedW = COLS[4].w + COLS[5].w;
+      drawCell(doc, cx, y, mergedW, ROW_H, 'Accepted By Supplier',
+        { fill: PDF_WHITE, size: 8, align:'center', border: true });
       cx += mergedW;
     } else {
       drawCell(doc, cx, y, COLS[4].w, ROW_H, it.category||'',
